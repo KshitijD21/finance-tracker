@@ -1,12 +1,20 @@
-export default {
-  fetch(request) {
-    const url = new URL(request.url);
+import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 
-    if (url.pathname.startsWith("/api/")) {
-      return Response.json({
-        name: "Cloudflare",
-      });
-    }
-		return new Response(null, { status: 404 });
-  },
-} satisfies ExportedHandler<Env>;
+const app = new Hono()
+
+app.use('/*', cors())
+
+app.get('/api/', (c) => {
+  console.log('✅ Worker: GET / called')
+  return c.json({
+    name: 'Cloudflare Worker',
+    timestamp: new Date().toISOString()
+  })
+})
+
+app.get('/api/health', (c) => {
+  return c.json({ status: 'ok' })
+})
+
+export default app
