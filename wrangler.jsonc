@@ -6,13 +6,29 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "finance-tracker",
 	"main": "worker/index.ts",
-	"compatibility_date": "2025-11-26",
+	"compatibility_date": "2025-11-25",
 	"assets": {
 		"not_found_handling": "single-page-application"
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "FINANCE_MEMORY",
+				"class_name": "FinanceMemory"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": [
+				"FinanceMemory"
+			]
+		}
+	]
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
