@@ -43,8 +43,6 @@ export function useVoiceConversation(
 
   // Query the server with user input using our existing API
   const queryServer = useCallback(async (message: string): Promise<{ response: string; expense?: unknown }> => {
-    console.log('💬 [Voice] Querying server:', message);
-
     try {
       const userId = getUserId();
       const result = await api.sendVoiceCommand(userId, message);
@@ -56,10 +54,8 @@ export function useVoiceConversation(
       const response = result.message;
       const expense = result.data?.expense;
 
-      console.log('✅ [Voice] Server replied:', response);
       return { response, expense };
     } catch (err) {
-      console.error('❌ [Voice] Server error:', err);
       throw err;
     }
   }, []);
@@ -69,12 +65,10 @@ export function useVoiceConversation(
     const wasSpeaking = previousSpeakingRef.current;
     const isCurrentlySpeaking = isSpeaking;
 
-    console.log(`🔊 Speaking: ${wasSpeaking} → ${isCurrentlySpeaking}`);
     previousSpeakingRef.current = isCurrentlySpeaking;
 
     // AI started speaking - stop mic to prevent echo
     if (!wasSpeaking && isCurrentlySpeaking) {
-      console.log('🔇 AI started speaking - stopping mic');
       if (isListening) {
         stopListening();
       }
@@ -82,15 +76,12 @@ export function useVoiceConversation(
 
     // AI finished speaking
     if (wasSpeaking && !isCurrentlySpeaking) {
-      console.log('🎤 AI finished speaking');
-
       // Only auto-resume if conversation is active
       if (isActiveRef.current) {
         setPhase('idle');
 
         setTimeout(() => {
           if (isActiveRef.current) {
-            console.log('🔄 Auto-resuming microphone...');
             setPhase('listening');
             startListening();
           }
@@ -106,13 +97,11 @@ export function useVoiceConversation(
 
     // Prevent duplicate sends
     if (transcript === lastSentMessageRef.current) {
-      console.log('⏭️ Skipping duplicate message');
       resetTranscript();
       return;
     }
 
     const sendMessage = async () => {
-      console.log('📤 Sending:', transcript);
       lastSentMessageRef.current = transcript;
 
       setPhase('thinking');
@@ -125,7 +114,6 @@ export function useVoiceConversation(
 
         // Trigger callback with response and expense data
         if (options?.onMessageReceived) {
-          console.log('📝 Triggering message received callback');
           options.onMessageReceived(response, expense);
         }
 
@@ -133,12 +121,10 @@ export function useVoiceConversation(
         await speak(response, () => {
           // This callback is called when audio starts playing
           if (isActiveRef.current) {
-            console.log('🔊 Audio started - changing to speaking phase');
             setPhase('speaking');
           }
         });
       } catch (err) {
-        console.error('❌ Send error:', err);
         setError(
           err instanceof Error ? err.message : 'Failed to process message'
         );
@@ -181,11 +167,9 @@ export function useVoiceConversation(
   // Start voice conversation
   const start = useCallback(() => {
     if (isActiveRef.current) {
-      console.log('⏩ [Voice] Already active');
       return;
     }
 
-    console.log('🚀 [Voice] Starting conversation');
     isActiveRef.current = true;
     setError(null);
     setPhase('listening');
@@ -200,7 +184,6 @@ export function useVoiceConversation(
 
   // Stop voice conversation
   const stop = useCallback(() => {
-    console.log('🛑 [Voice] Stopping conversation');
     isActiveRef.current = false;
     stopListening();
     setPhase('idle');

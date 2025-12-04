@@ -5,8 +5,6 @@ export async function classifyIntent(
   input: string
 ): Promise<Intent> {
 
-  console.log('🎯 Classifying intent for:', input);
-
   if (!AI) {
     return quickIntentDetection(input);
   }
@@ -35,19 +33,17 @@ export async function classifyIntent(
 
     // Ensure text is a string before calling .match()
     if (!text || typeof text !== 'string') {
-      console.warn('⚠️ AI response was empty or invalid, using fallback');
       return quickIntentDetection(input);
     }
 
     const jsonMatch = text.match(/\{[\s\S]*?\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
-      console.log('✅ Intent classified:', parsed.intent);
       return parsed.intent as Intent;
     }
 
   } catch (error) {
-    console.error('❌ Intent classification error:', error);
+    // Intent classification error
   }
 
   return quickIntentDetection(input);

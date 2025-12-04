@@ -30,8 +30,6 @@ app.get('/', (c) => {
 
 app.post('/api/expense-natural', async (c) => {
   try {
-    console.log('📥 API: Natural language expense entry');
-
     const body = await c.req.json();
     const { userId, input } = body;
 
@@ -43,8 +41,6 @@ app.post('/api/expense-natural', async (c) => {
       return c.json({ success: false, error: 'input required' }, 400);
     }
 
-    console.log('🤖 Processing:', input);
-
     const aiResult = await processExpenseInput(c.env.AI, input);
 
     if (!aiResult.success) {
@@ -53,8 +49,6 @@ app.post('/api/expense-natural', async (c) => {
         error: 'Could not understand expense'
       }, 400);
     }
-
-    console.log('✅ AI Result:', aiResult);
 
     const expense: Expense = {
       id: crypto.randomUUID(),
@@ -65,8 +59,6 @@ app.post('/api/expense-natural', async (c) => {
       date: new Date().toISOString().split('T')[0],
       createdAt: Date.now()
     };
-
-    console.log('💾 Saving to database...');
 
     try {
       const id = c.env.FINANCE_MEMORY.idFromName(userId);
@@ -83,12 +75,9 @@ app.post('/api/expense-natural', async (c) => {
           if (retries === 0 || !err.retryable) {
             throw err;
           }
-          console.log(`⚠️ Retrying... (${3 - retries}/3)`);
           await new Promise(resolve => setTimeout(resolve, 100));
         }
       }
-
-      console.log('✅ Saved successfully!');
 
       return c.json({
         success: true,
@@ -259,19 +248,13 @@ app.delete('/api/chat/:userId', async (c) => {
 
 app.post('/api/voice-command', async (c) => {
   try {
-    console.log('🎙️ Voice command received');
-
     const { userId, input } = await c.req.json();
 
     if (!userId || !input) {
       return c.json({ success: false, error: 'Missing userId or input' }, 400);
     }
 
-    console.log('📝 Input:', input);
-
     const intent = await classifyIntent(c.env.AI, input);
-
-    console.log('🎯 Intent:', intent);
 
 
     if (intent === INTENTS.ADD_EXPENSE) {
@@ -309,7 +292,6 @@ app.post('/api/voice-command', async (c) => {
             if (retries === 0 || !err.retryable) {
               throw err;
             }
-            console.log(`⚠️ Retrying... (${3 - retries}/3)`);
             await new Promise(resolve => setTimeout(resolve, 100));
           }
         }
@@ -321,7 +303,6 @@ app.post('/api/voice-command', async (c) => {
         });
 
       } catch (dbError) {
-        console.error('❌ DB Error:', dbError);
         return c.json({
           success: false,
           message: "Sorry, couldn't save your expense."
@@ -404,7 +385,6 @@ app.post('/api/voice-command', async (c) => {
     }
 
   } catch (error) {
-    console.error('❌ Voice command error:', error);
     return c.json({
       success: false,
       message: "Oops! Something went wrong."

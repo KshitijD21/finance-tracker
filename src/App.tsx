@@ -31,37 +31,26 @@ function App() {
         setExpenses(response.expenses);
       }
     } catch (error) {
-      console.error("Failed to load expenses:", error);
+      // Error loading expenses
     }
   };
 
   const loadChatHistory = async (uid: string) => {
     try {
-      console.log(`📖 Loading chat history for user: ${uid}`);
       const response = await api.getChatHistory(uid);
       if (response.success) {
-        console.log(`📜 Loaded ${response.messages.length} chat messages`);
-        console.log(
-          "Messages:",
-          response.messages.map((m) => ({
-            role: m.role,
-            content: m.content.substring(0, 50),
-          }))
-        );
         setMessages(response.messages);
       }
     } catch (error) {
-      console.error("❌ Failed to load chat history:", error);
+      // Error loading chat history
     }
   };
 
   const saveChatMessage = async (message: Message) => {
     try {
-      console.log(`💾 Saving message [${message.role}]:`, message.content);
       await api.saveChatMessage(userId, message);
-      console.log(`✅ Message saved successfully`);
     } catch (error) {
-      console.error("❌ Failed to save chat message:", error);
+      // Error saving chat message
     }
   };
 

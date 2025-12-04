@@ -26,13 +26,6 @@ export function ChatSection({
   };
 
   useEffect(() => {
-    console.log(
-      `💬 ChatSection: Rendering ${messages.length} messages`,
-      messages.map((m) => ({
-        role: m.role,
-        content: m.content.substring(0, 30) + "...",
-      }))
-    );
     scrollToBottom();
   }, [messages]);
 

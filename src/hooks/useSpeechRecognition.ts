@@ -42,15 +42,12 @@ export function useSpeechRecognition() {
       setTranscript(fullTranscript);
       setIsFinal(false);
 
-      console.log('📝 Transcript:', fullTranscript);
-
       if (silenceTimerRef.current) {
         clearTimeout(silenceTimerRef.current);
       }
 
       silenceTimerRef.current = setTimeout(() => {
         if (fullTranscript && fullTranscript !== lastSentTranscriptRef.current) {
-          console.log('🔔 User stopped speaking - ready to send');
           lastSentTranscriptRef.current = fullTranscript;
           setIsFinal(true);
         }
@@ -58,7 +55,6 @@ export function useSpeechRecognition() {
     };
 
     recognition.onend = () => {
-      console.log('🛑 Recognition ended');
       setIsListening(false);
 
       if (silenceTimerRef.current) {
@@ -66,9 +62,8 @@ export function useSpeechRecognition() {
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onerror = (event: any) => {
-      console.error('Recognition error:', event.error);
+    recognition.onerror = () => {
+      // Recognition error
     };
 
     recognition.start();
@@ -78,14 +73,12 @@ export function useSpeechRecognition() {
     setTranscript('');
     setIsFinal(false);
     lastSentTranscriptRef.current = '';
-    console.log('🎤 Started listening...');
   }, []);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
-      console.log('🛑 Stopped listening');
 
       if (silenceTimerRef.current) {
         clearTimeout(silenceTimerRef.current);

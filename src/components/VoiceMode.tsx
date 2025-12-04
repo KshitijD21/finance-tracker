@@ -44,8 +44,8 @@ export function VoiceMode({
         });
         streamRef.current = stream;
         setAudioStream(stream);
-      } catch (err) {
-        console.error("Failed to get microphone access:", err);
+      } catch {
+        // Failed to get microphone access
       }
     };
 

@@ -14,12 +14,8 @@ export async function processExpenseInput(
   input: string
 ): Promise<ProcessedExpense> {
 
-  console.log('🤖 AI: Processing expense input:', input);
-
   try {
     const userPrompt = getExpenseEntryPrompt(input);
-
-    console.log('🤖 AI: Sending prompt to AI');
 
     const response = await AI.run(
       AI_CONFIG.model,
@@ -39,8 +35,6 @@ export async function processExpenseInput(
       }
     ) as { response?: string; result?: { response?: string } } | string;
 
-    console.log('🤖 AI: Got response:', response);
-
     let aiText = '';
 
     if (typeof response === 'string') {
@@ -51,26 +45,19 @@ export async function processExpenseInput(
       aiText = response.result.response;
     }
 
-    console.log('🤖 AI: Extracted text:', aiText);
-
     if (!aiText) {
-      console.error('❌ AI: Empty response');
       return fallbackParsing(input);
     }
 
     const jsonMatch = aiText.match(/\{[\s\S]*?\}/);
 
     if (!jsonMatch) {
-      console.error('❌ AI: No JSON found in response');
       return fallbackParsing(input);
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
 
-    console.log('✅ AI: Parsed result:', parsed);
-
     if (!parsed.amount || !parsed.category || !parsed.message) {
-      console.error('❌ AI: Missing required fields in response');
       return fallbackParsing(input);
     }
 
@@ -83,13 +70,11 @@ export async function processExpenseInput(
     };
 
   } catch (error) {
-    console.error('❌ AI Error:', error);
     return fallbackParsing(input);
   }
 }
 
 function fallbackParsing(input: string): ProcessedExpense {
-  console.log('⚠️ Using fallback parsing for:', input);
 
   // Extract amount - handle various formats
   const amountMatch = input.match(/\$?(\d+(?:[.,]\d{1,2})?)/);

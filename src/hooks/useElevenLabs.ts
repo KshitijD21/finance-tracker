@@ -18,15 +18,12 @@ export function useElevenLabs() {
     const voiceId = import.meta.env.VITE_ELEVENLABS_VOICE_ID || DEFAULT_VOICE_ID;
     const modelId = import.meta.env.VITE_ELEVENLABS_MODEL_ID || DEFAULT_MODEL_ID;
 
-    console.log('🎤 Speaking:', text);
     setIsSpeaking(true);
     setError(null);
 
     try {
       // If no API key, fall back to browser speech synthesis
       if (!apiKey) {
-        console.log('📢 No API key: Using browser Speech Synthesis');
-
         // Fallback to browser speech synthesis
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.rate = 0.9;
@@ -34,19 +31,16 @@ export function useElevenLabs() {
         utterance.volume = 0.8;
 
         utterance.onstart = () => {
-          console.log('🔊 Speech started');
           if (onAudioStart) {
             onAudioStart();
           }
         };
 
         utterance.onend = () => {
-          console.log('✅ Finished speaking');
           setIsSpeaking(false);
         };
 
-        utterance.onerror = (e) => {
-          console.error('❌ Speech synthesis error:', e);
+        utterance.onerror = () => {
           setError('Failed to synthesize speech');
           setIsSpeaking(false);
         };
@@ -77,8 +71,6 @@ export function useElevenLabs() {
         throw new Error(`ElevenLabs API error: ${response.status}`);
       }
 
-      console.log('✅ Audio received from ElevenLabs');
-
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
 
@@ -87,19 +79,16 @@ export function useElevenLabs() {
 
       await new Promise<void>((resolve, reject) => {
         audio.onended = () => {
-          console.log('✅ Finished speaking');
           URL.revokeObjectURL(audioUrl);
           resolve();
         };
 
-        audio.onerror = (e) => {
-          console.error('❌ Audio playback error:', e);
+        audio.onerror = () => {
           setError('Failed to play audio');
-          reject(e);
+          reject(new Error('Audio playback failed'));
         };
 
         audio.onplay = () => {
-          console.log('🔊 Audio started playing');
           if (onAudioStart) {
             onAudioStart();
           }
@@ -110,7 +99,6 @@ export function useElevenLabs() {
 
       setIsSpeaking(false);
     } catch (err) {
-      console.error('❌ Speech synthesis error:', err);
       setError(
         err instanceof Error ? err.message : 'Failed to generate speech'
       );

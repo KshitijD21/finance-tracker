@@ -7,9 +7,11 @@ export async function queryExpenses(
   expenses: Expense[]
 ): Promise<string> {
 
-  console.log('💬 Answering query:', question);
+  if (expenses.length === 0) {
+    return fallbackQueryResponse(question, expenses);
+  }
 
-  if (!AI || expenses.length === 0) {
+  if (!AI) {
     return fallbackQueryResponse(question, expenses);
   }
 
@@ -36,12 +38,11 @@ export async function queryExpenses(
     }
 
     if (text) {
-      console.log('✅ Query response:', text);
       return text.trim();
     }
 
   } catch (error) {
-    console.error('❌ Query error:', error);
+    // Query error
   }
 
   return fallbackQueryResponse(question, expenses);

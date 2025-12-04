@@ -15,8 +15,6 @@ export async function identifyExpenseToDelete(
   expenses: Expense[]
 ): Promise<DeleteResult> {
 
-  console.log('🗑️ Identifying expense to delete');
-
   if (expenses.length === 0) {
     return {
       expenseId: null,
@@ -77,7 +75,7 @@ export async function identifyExpenseToDelete(
     }
 
   } catch (error) {
-    console.error('❌ Delete identification error:', error);
+    // Delete identification error
   }
 
   return fallbackDeleteIdentification(userInput, expenses);
