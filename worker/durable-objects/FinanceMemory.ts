@@ -35,6 +35,27 @@ export class FinanceMemory extends DurableObject<Env> {
     return expenses;
   }
 
+  async deleteExpense(expenseId: string): Promise<boolean> {
+    console.log('🗑️ DO: Deleting expense:', expenseId);
+
+    let expenses = await this.ctx.storage.get<Expense[]>('expenses');
+    if (!expenses) {
+      return false;
+    }
+
+    const initialLength = expenses.length;
+    expenses = expenses.filter(e => e.id !== expenseId);
+
+    if (expenses.length === initialLength) {
+      console.log('❌ DO: Expense not found');
+      return false;
+    }
+
+    await this.ctx.storage.put('expenses', expenses);
+    console.log('✅ DO: Deleted! Remaining:', expenses.length);
+    return true;
+  }
+
   // RPC method: Clear expenses
   async clearExpenses(): Promise<void> {
     console.log('🗑️ DO: Clearing expenses');

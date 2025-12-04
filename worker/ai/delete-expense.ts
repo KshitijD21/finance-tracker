@@ -1,0 +1,125 @@
+import type { Expense } from "../types/expense";
+import { getDeletePrompt, DELETE_SYSTEM_MESSAGE, DELETE_CONFIG } from './prompts/delete-expense';
+
+export interface DeleteResult {
+  expenseId: string | null;
+  message: string;
+  success: boolean;
+}
+
+export async function identifyExpenseToDelete(
+  AI: Ai | undefined,
+  userInput: string,
+  expenses: Expense[]
+): Promise<DeleteResult> {
+
+  console.log('🗑️ Identifying expense to delete');
+
+  if (expenses.length === 0) {
+    return {
+      expenseId: null,
+      message: "You don't have any expenses to delete!",
+      success: false
+    };
+  }
+
+  if (!AI) {
+    return fallbackDeleteIdentification(userInput, expenses);
+  }
+
+  try {
+    const prompt = getDeletePrompt(userInput, expenses);
+
+    const response = await AI.run(
+      '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+      {
+        messages: [
+          { role: 'system', content: DELETE_SYSTEM_MESSAGE },
+          { role: 'user', content: prompt }
+        ],
+        temperature: DELETE_CONFIG.temperature,
+        max_tokens: DELETE_CONFIG.max_tokens
+      }
+    ) as { response?: string } | string;
+
+    let text = '';
+    if (typeof response === 'string') {
+      text = response;
+    } else if (response.response) {
+      text = response.response;
+    }
+
+    const jsonMatch = text.match(/\{[\s\S]*?\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      if (parsed.expenseIndex !== null && parsed.expenseIndex >= 0) {
+        const expenseIdx = parsed.expenseIndex - 1;
+        const recentExpenses = expenses.slice(-10);
+
+        if (expenseIdx >= 0 && expenseIdx < recentExpenses.length) {
+          const expense = recentExpenses[expenseIdx];
+          return {
+            expenseId: expense.id,
+            message: parsed.message || `Deleted $${expense.amount} ${expense.merchant} expense.`,
+            success: true
+          };
+        }
+      }
+
+      return {
+        expenseId: null,
+        message: parsed.message || "Could you be more specific? Which expense?",
+        success: false
+      };
+    }
+
+  } catch (error) {
+    console.error('❌ Delete identification error:', error);
+  }
+
+  return fallbackDeleteIdentification(userInput, expenses);
+}
+
+function fallbackDeleteIdentification(userInput: string, expenses: Expense[]): DeleteResult {
+  const lower = userInput.toLowerCase();
+
+  if (/(?:last|recent|latest)/.test(lower)) {
+    const lastExpense = expenses[expenses.length - 1];
+    return {
+      expenseId: lastExpense.id,
+      message: `Deleted your last expense: $${lastExpense.amount} for ${lastExpense.merchant}.`,
+      success: true
+    };
+  }
+
+  for (const expense of expenses.reverse()) {
+    const merchantLower = (expense.merchant || '').toLowerCase();
+    if (merchantLower && lower.includes(merchantLower)) {
+      return {
+        expenseId: expense.id,
+        message: `Deleted $${expense.amount} ${expense.merchant} expense.`,
+        success: true
+      };
+    }
+  }
+
+  const amountMatch = userInput.match(/\$?(\d+(?:\.\d{2})?)/);
+  if (amountMatch) {
+    const amount = parseFloat(amountMatch[1]);
+    const matchingExpense = expenses.reverse().find(e => e.amount === amount);
+    if (matchingExpense) {
+      return {
+        expenseId: matchingExpense.id,
+        message: `Deleted $${amount} expense.`,
+        success: true
+      };
+    }
+  }
+
+  return {
+    expenseId: null,
+    message: "I couldn't find that expense. Can you be more specific?",
+    success: false
+  };
+}
