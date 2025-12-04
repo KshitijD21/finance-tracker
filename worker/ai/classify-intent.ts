@@ -33,6 +33,12 @@ export async function classifyIntent(
       text = response.response;
     }
 
+    // Ensure text is a string before calling .match()
+    if (!text || typeof text !== 'string') {
+      console.warn('⚠️ AI response was empty or invalid, using fallback');
+      return quickIntentDetection(input);
+    }
+
     const jsonMatch = text.match(/\{[\s\S]*?\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);

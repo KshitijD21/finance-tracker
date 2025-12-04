@@ -3,8 +3,10 @@ import { getDeletePrompt, DELETE_SYSTEM_MESSAGE, DELETE_CONFIG } from './prompts
 
 export interface DeleteResult {
   expenseId: string | null;
+  expenseIds?: string[]; // For bulk delete
   message: string;
   success: boolean;
+  isBulkDelete?: boolean;
 }
 
 export async function identifyExpenseToDelete(
@@ -84,7 +86,10 @@ export async function identifyExpenseToDelete(
 function fallbackDeleteIdentification(userInput: string, expenses: Expense[]): DeleteResult {
   const lower = userInput.toLowerCase();
 
-  if (/(?:last|recent|latest)/.test(lower)) {
+  // Check for "all" keyword for bulk delete
+  const isBulkDelete = /(?:all|every)/.test(lower);
+
+  if (/(?:last|recent|latest)/.test(lower) && !isBulkDelete) {
     const lastExpense = expenses[expenses.length - 1];
     return {
       expenseId: lastExpense.id,
@@ -107,13 +112,29 @@ function fallbackDeleteIdentification(userInput: string, expenses: Expense[]): D
   const amountMatch = userInput.match(/\$?(\d+(?:\.\d{2})?)/);
   if (amountMatch) {
     const amount = parseFloat(amountMatch[1]);
-    const matchingExpense = expenses.reverse().find(e => e.amount === amount);
-    if (matchingExpense) {
-      return {
-        expenseId: matchingExpense.id,
-        message: `Deleted $${amount} expense.`,
-        success: true
-      };
+
+    // Bulk delete: find ALL expenses with this amount
+    if (isBulkDelete) {
+      const matchingExpenses = expenses.filter(e => e.amount === amount);
+      if (matchingExpenses.length > 0) {
+        return {
+          expenseId: null,
+          expenseIds: matchingExpenses.map(e => e.id),
+          message: `Deleted all ${matchingExpenses.length} expense(s) of $${amount.toFixed(2)}.`,
+          success: true,
+          isBulkDelete: true
+        };
+      }
+    } else {
+      // Single delete: find first matching expense
+      const matchingExpense = expenses.reverse().find(e => e.amount === amount);
+      if (matchingExpense) {
+        return {
+          expenseId: matchingExpense.id,
+          message: `Deleted $${amount} expense.`,
+          success: true
+        };
+      }
     }
   }
 

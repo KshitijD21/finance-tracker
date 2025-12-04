@@ -16,10 +16,12 @@ function App() {
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [userId, setUserId] = useState<string>("");
 
+  // Initialize userId and load data
   useEffect(() => {
     const id = getUserId();
     setUserId(id);
     loadExpenses(id);
+    loadChatHistory(id);
   }, []);
 
   const loadExpenses = async (uid: string) => {
@@ -33,6 +35,36 @@ function App() {
     }
   };
 
+  const loadChatHistory = async (uid: string) => {
+    try {
+      console.log(`📖 Loading chat history for user: ${uid}`);
+      const response = await api.getChatHistory(uid);
+      if (response.success) {
+        console.log(`📜 Loaded ${response.messages.length} chat messages`);
+        console.log(
+          "Messages:",
+          response.messages.map((m) => ({
+            role: m.role,
+            content: m.content.substring(0, 50),
+          }))
+        );
+        setMessages(response.messages);
+      }
+    } catch (error) {
+      console.error("❌ Failed to load chat history:", error);
+    }
+  };
+
+  const saveChatMessage = async (message: Message) => {
+    try {
+      console.log(`💾 Saving message [${message.role}]:`, message.content);
+      await api.saveChatMessage(userId, message);
+      console.log(`✅ Message saved successfully`);
+    } catch (error) {
+      console.error("❌ Failed to save chat message:", error);
+    }
+  };
+
   const handleSendMessage = async (input: string) => {
     const userMessage: Message = {
       id: crypto.randomUUID(),
@@ -41,6 +73,10 @@ function App() {
       timestamp: Date.now(),
     };
     setMessages((prev) => [...prev, userMessage]);
+
+    // Save user message
+    saveChatMessage(userMessage);
+
     setIsLoading(true);
 
     try {
@@ -63,6 +99,9 @@ function App() {
 
       setMessages((prev) => [...prev, aiMessage]);
 
+      // Save AI message
+      saveChatMessage(aiMessage);
+
       await loadExpenses(userId);
     } catch {
       const errorMessage: Message = {
@@ -72,6 +111,9 @@ function App() {
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, errorMessage]);
+
+      // Save error message
+      saveChatMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +127,9 @@ function App() {
       timestamp: Date.now(),
     };
     setMessages((prev) => [...prev, aiMessage]);
+
+    // Save voice message
+    saveChatMessage(aiMessage);
 
     if (expense) {
       loadExpenses(userId);

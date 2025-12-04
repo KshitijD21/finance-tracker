@@ -1,4 +1,4 @@
-import type { VoiceCommandResponse, ExpenseResponse } from '@/types';
+import type { VoiceCommandResponse, ExpenseResponse, ChatResponse, Message } from '@/types';
 
 const API_BASE = '/api';
 
@@ -48,6 +48,38 @@ export const api = {
 
     if (!response.ok) {
       throw new Error('Failed to clear expenses');
+    }
+  },
+
+  async getChatHistory(userId: string): Promise<ChatResponse> {
+    const response = await fetch(`${API_BASE}/chat/${userId}`);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch chat history');
+    }
+
+    return response.json();
+  },
+
+  async saveChatMessage(userId: string, message: Message): Promise<void> {
+    const response = await fetch(`${API_BASE}/chat/${userId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(message),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to save chat message');
+    }
+  },
+
+  async clearChatHistory(userId: string): Promise<void> {
+    const response = await fetch(`${API_BASE}/chat/${userId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to clear chat history');
     }
   },
 };

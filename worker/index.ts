@@ -190,6 +190,73 @@ app.delete('/api/expenses/:userId', async (c) => {
   }
 });
 
+// Chat history endpoints
+app.get('/api/chat/:userId', async (c) => {
+  try {
+    const userId = c.req.param('userId');
+    const id = c.env.FINANCE_MEMORY.idFromName(userId);
+    const stub = c.env.FINANCE_MEMORY.get(id);
+    const messages = await stub.getChatMessages();
+
+    return c.json({ success: true, messages, count: messages.length });
+  } catch (err) {
+    return c.json({ error: String(err) }, 500);
+  }
+});
+
+app.post('/api/chat/:userId', async (c) => {
+  try {
+    const userId = c.req.param('userId');
+    const body = await c.req.json();
+
+    if (!body.role || !body.content) {
+      return c.json({ error: 'Missing role or content' }, 400);
+    }
+
+    const message = {
+      id: body.id || crypto.randomUUID(),
+      role: body.role,
+      content: body.content,
+      timestamp: body.timestamp || Date.now(),
+      expense: body.expense
+    };
+
+    const id = c.env.FINANCE_MEMORY.idFromName(userId);
+    const stub = c.env.FINANCE_MEMORY.get(id);
+
+    // Retry logic for Durable Object connection issues
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        await stub.addChatMessage(message);
+        break;
+      } catch (err: any) {
+        retries--;
+        if (retries === 0 || !err.retryable) {
+          throw err;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+
+    return c.json({ success: true, message });
+  } catch (err) {
+    return c.json({ error: String(err) }, 500);
+  }
+});
+
+app.delete('/api/chat/:userId', async (c) => {
+  try {
+    const userId = c.req.param('userId');
+    const id = c.env.FINANCE_MEMORY.idFromName(userId);
+    const stub = c.env.FINANCE_MEMORY.get(id);
+    await stub.clearChatMessages();
+    return c.json({ success: true });
+  } catch (err) {
+    return c.json({ error: String(err) }, 500);
+  }
+});
+
 app.post('/api/voice-command', async (c) => {
   try {
     console.log('🎙️ Voice command received');
@@ -290,14 +357,31 @@ app.post('/api/voice-command', async (c) => {
 
       const deleteResult = await identifyExpenseToDelete(c.env.AI, input, expenses);
 
-      if (!deleteResult.success || !deleteResult.expenseId) {
+      if (!deleteResult.success || (!deleteResult.expenseId && !deleteResult.expenseIds)) {
         return c.json({
           success: false,
           message: deleteResult.message
         });
       }
 
-      const deleted = await stub.deleteExpense(deleteResult.expenseId);
+      // Bulk delete: delete all matching expenses
+      if (deleteResult.isBulkDelete && deleteResult.expenseIds) {
+        let deletedCount = 0;
+        for (const expenseId of deleteResult.expenseIds) {
+          const deleted = await stub.deleteExpense(expenseId);
+          if (deleted) deletedCount++;
+        }
+
+        return c.json({
+          success: true,
+          message: deletedCount > 0
+            ? deleteResult.message
+            : "Couldn't delete those expenses. They might already be gone."
+        });
+      }
+
+      // Single delete
+      const deleted = await stub.deleteExpense(deleteResult.expenseId!);
 
       if (deleted) {
         return c.json({

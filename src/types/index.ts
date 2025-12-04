@@ -34,3 +34,9 @@ export interface ExpenseResponse {
   expenses: Expense[];
   count: number;
 }
+
+export interface ChatResponse {
+  success: boolean;
+  messages: Message[];
+  count: number;
+}
