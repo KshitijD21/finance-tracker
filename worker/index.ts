@@ -72,7 +72,21 @@ app.post('/api/expense-natural', async (c) => {
       const id = c.env.FINANCE_MEMORY.idFromName(userId);
       const stub = c.env.FINANCE_MEMORY.get(id);
 
-      await stub.addExpense(expense);
+      // Retry logic for Durable Object connection issues in dev mode
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          await stub.addExpense(expense);
+          break;
+        } catch (err: any) {
+          retries--;
+          if (retries === 0 || !err.retryable) {
+            throw err;
+          }
+          console.log(`⚠️ Retrying... (${3 - retries}/3)`);
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
 
       console.log('✅ Saved successfully!');
 
@@ -129,7 +143,21 @@ app.post('/api/expenses', async (c) => {
 
     const id = c.env.FINANCE_MEMORY.idFromName(body.userId);
     const stub = c.env.FINANCE_MEMORY.get(id);
-    await stub.addExpense(expense);
+
+    // Retry logic for Durable Object connection issues
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        await stub.addExpense(expense);
+        break;
+      } catch (err: any) {
+        retries--;
+        if (retries === 0 || !err.retryable) {
+          throw err;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
 
     return c.json({ success: true, expense });
   } catch (err) {
@@ -202,7 +230,22 @@ app.post('/api/voice-command', async (c) => {
       try {
         const id = c.env.FINANCE_MEMORY.idFromName(userId);
         const stub = c.env.FINANCE_MEMORY.get(id);
-        await stub.addExpense(expense);
+
+        // Retry logic for Durable Object connection issues in dev mode
+        let retries = 3;
+        while (retries > 0) {
+          try {
+            await stub.addExpense(expense);
+            break;
+          } catch (err: any) {
+            retries--;
+            if (retries === 0 || !err.retryable) {
+              throw err;
+            }
+            console.log(`⚠️ Retrying... (${3 - retries}/3)`);
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
 
         return c.json({
           success: true,

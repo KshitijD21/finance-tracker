@@ -16,12 +16,6 @@ function App() {
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [userId, setUserId] = useState<string>("");
 
-  const currentMonth = new Date().toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-  });
-
-  // Initialize userId and load expenses
   useEffect(() => {
     const id = getUserId();
     setUserId(id);
@@ -40,7 +34,6 @@ function App() {
   };
 
   const handleSendMessage = async (input: string) => {
-    // Add user message
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: "user",
@@ -53,7 +46,6 @@ function App() {
     try {
       const response = await api.sendVoiceCommand(userId, input);
 
-      // Add AI response
       const aiMessage: Message = {
         id: crypto.randomUUID(),
         role: "ai",
@@ -61,7 +53,6 @@ function App() {
         timestamp: Date.now(),
       };
 
-      // If an expense was added, include it in the message
       if (response.data?.expense) {
         aiMessage.expense = {
           merchant: response.data.expense.merchant || "Unknown",
@@ -72,7 +63,6 @@ function App() {
 
       setMessages((prev) => [...prev, aiMessage]);
 
-      // Reload expenses
       await loadExpenses(userId);
     } catch {
       const errorMessage: Message = {
@@ -87,17 +77,26 @@ function App() {
     }
   };
 
-  const handleVoiceTranscript = async (transcript: string) => {
-    await handleSendMessage(transcript);
+  const handleVoiceMessageReceived = (message: string, expense?: unknown) => {
+    const aiMessage: Message = {
+      id: crypto.randomUUID(),
+      role: "ai",
+      content: message,
+      timestamp: Date.now(),
+    };
+    setMessages((prev) => [...prev, aiMessage]);
+
+    if (expense) {
+      loadExpenses(userId);
+    }
   };
 
   return (
     <div className="h-screen flex flex-col bg-white">
-      <TopBar currentMonth={currentMonth} />
+      <TopBar />
 
-      {/* Desktop Layout */}
       <div className="hidden md:flex flex-1 overflow-hidden">
-        <div className="w-[65%] h-full">
+        <div className="w-[50%] h-full ml-[15%]">
           <ChatSection
             messages={messages}
             isLoading={isLoading}
@@ -110,7 +109,6 @@ function App() {
         </div>
       </div>
 
-      {/* Mobile Layout */}
       <div className="md:hidden flex-1 overflow-hidden">
         <Tabs defaultValue="chat" className="h-full flex flex-col">
           <TabsList className="w-full grid grid-cols-2 rounded-none h-12 bg-gray-50">
@@ -143,11 +141,10 @@ function App() {
         </Tabs>
       </div>
 
-      {/* Voice Mode Overlay */}
       <VoiceMode
         isActive={isVoiceMode}
         onClose={() => setIsVoiceMode(false)}
-        onTranscript={handleVoiceTranscript}
+        onMessageReceived={handleVoiceMessageReceived}
       />
     </div>
   );
