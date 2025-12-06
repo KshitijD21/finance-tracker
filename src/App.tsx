@@ -108,6 +108,19 @@ function App() {
     }
   };
 
+  const handleVoiceUserMessage = (message: string) => {
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: message,
+      timestamp: Date.now(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+
+    // Save user voice message
+    saveChatMessage(userMessage);
+  };
+
   const handleVoiceMessageReceived = (message: string, expense?: unknown) => {
     const aiMessage: Message = {
       id: crypto.randomUUID(),
@@ -179,6 +192,7 @@ function App() {
         isActive={isVoiceMode}
         onClose={() => setIsVoiceMode(false)}
         onMessageReceived={handleVoiceMessageReceived}
+        onUserMessage={handleVoiceUserMessage}
       />
     </div>
   );

@@ -36,7 +36,6 @@ export function useAudioVisualization(audioStream: MediaStream | null): AudioVis
 
     const updateFrequency = () => {
       if (analyserRef.current && frequencyDataRef.current) {
-        // @ts-expect-error - TypeScript strict mode issue with Uint8Array buffer types
         analyserRef.current.getByteFrequencyData(frequencyDataRef.current);
       }
       animationFrameRef.current = requestAnimationFrame(updateFrequency);

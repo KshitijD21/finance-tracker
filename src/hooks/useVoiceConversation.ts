@@ -8,6 +8,7 @@ type Phase = 'idle' | 'listening' | 'thinking' | 'speaking' | 'error';
 
 interface UseVoiceConversationOptions {
   onMessageReceived?: (message: string, expense?: unknown) => void;
+  onUserMessage?: (message: string) => void;
 }
 
 interface UseVoiceConversationReturn {
@@ -103,6 +104,11 @@ export function useVoiceConversation(
 
     const sendMessage = async () => {
       lastSentMessageRef.current = transcript;
+
+      // Send user's transcription to chat
+      if (options?.onUserMessage) {
+        options.onUserMessage(transcript);
+      }
 
       setPhase('thinking');
       stopListening();

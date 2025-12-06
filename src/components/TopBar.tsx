@@ -7,7 +7,7 @@ export function TopBar() {
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-400 flex items-center justify-center">
           <Wallet className="w-4 h-4 text-white" />
         </div>
-        <h1 className="text-lg font-medium text-gray-900">FinChat</h1>
+        <h1 className="text-lg font-medium text-gray-900">Fiscus</h1>
       </div>
     </div>
   );

@@ -43,10 +43,10 @@ export function ChatSection({
       {/* Header */}
       <div className="p-6 pb-4">
         <h2 className="text-xl font-semibold text-gray-900 mb-1">
-          Chat with your Finance Copilot
+          Smart Money, Smarter Conversations
         </h2>
         <p className="text-sm text-gray-500">
-          Speak or type to add expenses or ask questions.
+          Your personal financial intelligence.
         </p>
       </div>
 

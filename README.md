@@ -1,7 +1,7 @@
-# 🎙️ FinChat - AI-Powered Conversational Expense Tracker
+# 🎙️ Fiscus - AI-Powered Conversational Expense Tracker
 
 > **Stop filling forms. Start talking.**
-> FinChat is an AI-powered expense tracker that understands natural conversation. Just say "I spent $50 on coffee" and the AI automatically categorizes, stores, and tracks it.
+> Fiscus is an AI-powered expense tracker that understands natural conversation. Just say "I spent $50 on coffee" and the AI automatically categorizes, stores, and tracks it.
 
 [![Built with Cloudflare](https://img.shields.io/badge/Built%20with-Cloudflare-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 [![Powered by Workers AI](https://img.shields.io/badge/Powered%20by-Workers%20AI-F38020)](https://ai.cloudflare.com/)
@@ -31,11 +31,11 @@ Traditional apps like Mint, YNAB, and Copilot require:
 
 ---
 
-## 💡 The Solution: FinChat
+## 💡 The Solution: Fiscus
 
 **"What if you could just TALK to your expense tracker?"**
 
-FinChat is an AI-powered expense tracker that you control entirely through conversation. Just say "I spent $50 on coffee" and the AI automatically categorizes, stores, and tracks it. Ask "How much did I spend on food?" and get instant answers.
+Fiscus is an AI-powered expense tracker that you control entirely through conversation. Just say "I spent $50 on coffee" and the AI automatically categorizes, stores, and tracks it. Ask "How much did I spend on food?" and get instant answers.
 
 **It's like having a personal financial assistant in your pocket.**
 
@@ -58,19 +58,19 @@ FinChat is an AI-powered expense tracker that you control entirely through conve
 ### **Conversational Interface + AI Intelligence**
 
 Traditional apps make **YOU** adapt to **THEM**.
-FinChat adapts to **YOU** - you just speak naturally.
+Fiscus adapts to **YOU** - you just speak naturally.
 
 **Example Interactions:**
 
 ```
 You: "I spent $50 on coffee at Starbucks"
-FinChat: ✅ Got it! Added $50 for coffee at Starbucks
+Fiscus: ✅ Got it! Added $50 for coffee at Starbucks
 
 You: "How much did I spend on food this week?"
-FinChat: 💰 You spent $287 on food this week across 12 transactions
+Fiscus: 💰 You spent $287 on food this week across 12 transactions
 
 You: "Delete my last coffee expense"
-FinChat: 🗑️ Deleted $50 coffee expense from Starbucks
+Fiscus: 🗑️ Deleted $50 coffee expense from Starbucks
 ```
 
 ---
