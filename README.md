@@ -180,6 +180,21 @@ UI updates in real-time
 
 ---
 
+## 🎬 Live Demo
+
+**Try it now:** [https://9c6acdb0.cf_ai_finance-tracker-cr2.pages.dev](https://9c6acdb0.cf_ai_finance-tracker-cr2.pages.dev)
+
+### Quick Test:
+1. Click the **microphone button** (grant browser permission)
+2. Say: **"I spent $50 on coffee at Starbucks"**
+3. AI responds and saves your expense!
+4. Ask: **"How much did I spend on food?"**
+5. Get instant conversational answers!
+
+**Note:** Voice features require HTTPS (✅ works on live demo)
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -193,8 +208,8 @@ UI updates in real-time
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/KshitijD21/finance-tracker.git
-   cd finance-tracker
+   git clone https://github.com/KshitijD21/cf_ai_cf_ai_finance-tracker.git
+   cd cf_ai_cf_ai_finance-tracker
    ```
 
 2. **Install dependencies**
@@ -240,7 +255,7 @@ This will:
 ## 📁 Project Structure
 
 ```
-finance-tracker/
+cf_ai_finance-tracker/
 ├── src/                          # Frontend React application
 │   ├── components/               # React components
 │   │   ├── VoiceMode.tsx        # Voice interaction component
@@ -413,19 +428,6 @@ DELETE /api/chat/:userId
 
 ---
 
-## 🛣️ Roadmap
-
-- [ ] Multi-currency support
-- [ ] Receipt photo uploads
-- [ ] Budget tracking & alerts
-- [ ] Export to CSV/PDF
-- [ ] Recurring expense detection
-- [ ] Mobile app (React Native)
-- [ ] Shared expense tracking (roommates/families)
-- [ ] Integration with banking APIs (optional)
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -456,9 +458,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-**Kshitij** - [@KshitijD21](https://github.com/KshitijD21)
+**Kshitij Dumbre** - [@KshitijD21](https://github.com/KshitijD21)
 
-Project Link: [https://github.com/KshitijD21/finance-tracker](https://github.com/KshitijD21/finance-tracker)
+**Project Links:**
+- 🌐 Live Demo: [https://9c6acdb0.cf_ai_finance-tracker-cr2.pages.dev](https://9c6acdb0.cf_ai_finance-tracker-cr2.pages.dev)
+- 📦 GitHub: [https://github.com/KshitijD21/cf_ai_cf_ai_finance-tracker](https://github.com/KshitijD21/cf_ai_cf_ai_finance-tracker)
+- 📝 Documentation: [PROMPTS.md](./PROMPTS.md)
 
 ---
 
