@@ -182,9 +182,10 @@ UI updates in real-time
 
 ## 🎬 Live Demo
 
-**Try it now:** [https://9c6acdb0.cf_ai_finance-tracker-cr2.pages.dev](https://9c6acdb0.cf_ai_finance-tracker-cr2.pages.dev)
+**Try it now:** [https://9c6acdb0.finance-tracker-cr2.pages.dev](https://9c6acdb0.finance-tracker-cr2.pages.dev)
 
 ### Quick Test:
+
 1. Click the **microphone button** (grant browser permission)
 2. Say: **"I spent $50 on coffee at Starbucks"**
 3. AI responds and saves your expense!
@@ -208,8 +209,8 @@ UI updates in real-time
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/KshitijD21/cf_ai_cf_ai_finance-tracker.git
-   cd cf_ai_cf_ai_finance-tracker
+   git clone https://github.com/KshitijD21/finance-tracker.git
+   cd finance-tracker
    ```
 
 2. **Install dependencies**
@@ -220,11 +221,20 @@ UI updates in real-time
 
 3. **Set up environment variables**
 
-   Add your ElevenLabs API key to your environment (optional):
+   Create a `.env` file in the root directory:
 
    ```bash
-   # Add to your shell profile or .env.local
-   export VITE_ELEVENLABS_API_KEY=your_api_key_here
+   cp .env.example .env
+   ```
+
+   Then update `.env` with your ElevenLabs credentials and API URL:
+
+   ```bash
+   VITE_ELEVENLABS_API_KEY=your_api_key_here
+   VITE_ELEVENLABS_VOICE_ID=your_voice_id_here
+   VITE_ELEVENLABS_MODEL_ID=eleven_flash_v2
+
+   VITE_API_URL=https://your-backend.workers.dev/api
    ```
 
 4. **Run development server**
@@ -255,7 +265,7 @@ This will:
 ## 📁 Project Structure
 
 ```
-cf_ai_finance-tracker/
+finance-tracker/
 ├── src/                          # Frontend React application
 │   ├── components/               # React components
 │   │   ├── VoiceMode.tsx        # Voice interaction component
@@ -461,8 +471,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Kshitij Dumbre** - [@KshitijD21](https://github.com/KshitijD21)
 
 **Project Links:**
-- 🌐 Live Demo: [https://9c6acdb0.cf_ai_finance-tracker-cr2.pages.dev](https://9c6acdb0.cf_ai_finance-tracker-cr2.pages.dev)
-- 📦 GitHub: [https://github.com/KshitijD21/cf_ai_cf_ai_finance-tracker](https://github.com/KshitijD21/cf_ai_cf_ai_finance-tracker)
+
+- 🌐 Live Demo: [https://9c6acdb0.finance-tracker-cr2.pages.dev](https://9c6acdb0.finance-tracker-cr2.pages.dev)
+- 📦 GitHub: [https://github.com/KshitijD21/finance-tracker](https://github.com/KshitijD21/finance-tracker)
 - 📝 Documentation: [PROMPTS.md](./PROMPTS.md)
 
 ---
